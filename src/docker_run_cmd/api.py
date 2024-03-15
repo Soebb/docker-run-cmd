@@ -105,34 +105,6 @@ def docker_run(
                 else:
                     shutil.copy(str(src), str(td / dst))
 
-        docker_compose_content = DOCKER_COMPOSE_TEMPLATE.read_text(encoding="utf-8")
-        # add quotes to each object if they are not already quoted
-        cmd_list = [f'"{cmd}"' for cmd in cmd_list]
-        cmd_str = "[" + ",".join(cmd_list) + "]"
-        image_name = f"docker-run-cmd-{name}-image"
-        container_name = f"docker-run-cmd-{name}-container"
-        if platform is None:
-            platform = ""
-        else:
-            platform = f"platform: {platform}"
-        docker_compose_content = Template(docker_compose_content).substitute(
-            dockerfile="Dockerfile",
-            hostdir=str(cwd),
-            command=cmd_str,
-            image_name=image_name,
-            container_name=container_name,
-            platform=platform,
-        )
-        docker_compose_file = td / "docker-compose.yml"
-        docker_compose_file.write_text(docker_compose_content, encoding="utf-8")
-        # shutil.copy(DOCKER_COMPOSE_TEMPLATE, docker_compose_file)
-        print(f"docker-compose file: {docker_compose_file}")
-        target_dockerfile = td / "Dockerfile"
-        # if not the same path then copy
-        contents = dockerfile.read_text(encoding="utf-8")
-        target_dockerfile.write_text(contents, encoding="utf-8")
-        print(f"Dockerfile: {dockerfile}")
-        print()
         prev_dir = Path.cwd()
         os.chdir(td)
         rtn = 0
@@ -147,9 +119,6 @@ def docker_run(
             os.system("docker network prune --force")
             rtn = os.system("docker-compose up --no-log-prefix --exit-code-from app")
             os.system("docker network prune --force")
-            if shutdown_after_run:
-                print("Shutting down Docker container...")
-                os.system("docker-compose down")
             print("DONE")
         finally:
             os.chdir(prev_dir)
