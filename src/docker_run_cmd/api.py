@@ -63,9 +63,9 @@ def remove_existing_container(container_name):
 
 def docker_run(
     name: str,
-    dockerfile_or_url: str,
+    #dockerfile_or_url: str,
     cwd: Path,
-    cmd_list: list[str],
+    #cmd_list: list[str],
     extra_files: dict[Path, Path] | None = None,
     platform: str | None = None,
     shutdown_after_run: bool = True,
@@ -81,19 +81,6 @@ def docker_run(
     with TemporaryDirectory() as tempdir:
         td = Path(tempdir)
         print(f"Temporary directory: {td}")
-        dockerfile = Path(dockerfile_or_url)
-        if not dockerfile.exists():
-            # download the file
-            print(f"Downloading Dockerfile from {dockerfile_or_url}...")
-            dockerfile = download(
-                url=str(dockerfile_or_url), path=tempdir, replace=True
-            )
-            dockerfile = Path(dockerfile)
-            # rename to Dockerfile
-            dockerfile.rename(td / "Dockerfile")
-        else:
-            shutil.copy(dockerfile, td / "Dockerfile")
-
         # copy extra files
         if extra_files:
             for src, dst in extra_files.items():
