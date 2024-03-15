@@ -95,6 +95,7 @@ def docker_run(
         prev_dir = Path.cwd()
         os.chdir(td)
         rtn = 0
+        container_name = f"docker-run-cmd-{name}-container"
         try:
             os.system("docker-compose down --rmi all")
             # now docker compose run the app
